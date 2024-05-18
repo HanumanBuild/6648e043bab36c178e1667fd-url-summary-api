@@ -1,5 +1,6 @@
 const express = require('express');
 const axios = require('axios');
+const cheerio = require('cheerio');
 require('dotenv').config();
 
 const app = express();
@@ -11,7 +12,7 @@ app.get('/', (req, res) => {
   res.send('URL Summary API is running');
 });
 
-// Add the new endpoint to fetch URL content
+// Modify the /fetch-url-content endpoint to use Cheerio for extracting the main text
 app.post('/fetch-url-content', async (req, res) => {
   const { url } = req.body;
 
@@ -21,8 +22,16 @@ app.post('/fetch-url-content', async (req, res) => {
 
   try {
     const response = await axios.get(url);
-    const content = response.data;
-    res.json({ content });
+    const html = response.data;
+    const $ = cheerio.load(html);
+
+    // Remove script and style elements
+    $('script, style').remove();
+
+    // Extract the main text content
+    const mainText = $('body').text();
+
+    res.json({ mainText });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch URL content' });
   }
