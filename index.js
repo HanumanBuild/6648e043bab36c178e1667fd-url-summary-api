@@ -3,6 +3,8 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 require('dotenv').config();
 
+// Import OpenAI SDK
+
 const app = express();
 const port = process.env.PORT || 3000;
 
